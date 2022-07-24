@@ -1,5 +1,5 @@
 import React from "react";
-import { Button, Dialog, DialogActions, DialogContent, Grid, IconButton, Input, TextField, withStyles } from "@material-ui/core";
+import { Button, Dialog, DialogActions, DialogContent, Grid, IconButton, Input, TextField, withStyles, Typography } from "@material-ui/core";
 import { LocationOnOutlined, NotesOutlined, AccessTime, Close } from "@material-ui/icons";
 import { DatePicker } from "@material-ui/pickers";
 import * as styles from "./style.css";
@@ -7,18 +7,22 @@ import * as styles from "./style.css";
 const spacer = { margin: "4px 0" }
 
 const Title = withStyles({
-  root: { marginBottom: 32, fontSize: 22 }
+  root: { fontSize: 22 }
 })(Input);
 
 const AddScheduleDialog = ({
   schedule: {
     form: {title, location, description, date },
-    isDialogOpen
+    isDialogOpen,
+    isStartEdit,
   },
   closeDialog,
   setSchedule,
   saveSchedule,
+  setIsEditStart,
 }) => {
+  const isTitleInvalid = !title && isStartEdit;
+
   return (
     <Dialog open={isDialogOpen} onClose={closeDialog} maxWidth="xs" fullWidth>
       <DialogActions>
@@ -35,7 +39,16 @@ const AddScheduleDialog = ({
           placeholder="タイトルと日時を追加"
           value={title}
           onChange={e => setSchedule({ title: e.target.value })}
+          onBlur={setIsEditStart}
+          error={isTitleInvalid}
         />
+        <div className={styles.validation}>
+          {isTitleInvalid && (
+            <Typography variant="caption" component="div" color="error">
+              タイトルは必須です。
+            </Typography>
+          )}
+        </div>
         <Grid container spacing={1} alignItems="center" justify="space-between">
           <Grid item >
             <AccessTime />
@@ -83,7 +96,7 @@ const AddScheduleDialog = ({
         </Grid>
       </DialogContent>
       <DialogActions>
-        <Button color="primary" variant="outlined" onClick={saveSchedule}>
+        <Button color="primary" variant="outlined" onClick={saveSchedule} disabled={!title}>
           保存
         </Button>
       </DialogActions>
